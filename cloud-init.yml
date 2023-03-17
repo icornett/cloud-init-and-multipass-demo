@@ -1,0 +1,33 @@
+#cloud-config
+
+package_update: true
+package_upgrade: true
+
+packages:
+- docker-ce
+- wget
+- software-properties-common
+- nfs-common
+
+runcmd:
+- ["mkdir", "-p", /nfsdata/www"]
+- ["docker", "run", "-dit", "--name", "nginx", "-v", "/nfsdata/www:/usr/share/nginx/html", "nginx"]
+
+snap:
+- ["install", "powershell", "--classic"]
+
+mounts:
+- ["stslalomcloudinit.blob.core.windows.net:/stslalomcloudinit/nfs", "/nfsdata", "nfs", "defaults,sec=sys,vers=3,nolock,proto=tcp,nofail", "0", "0"]
+
+ssh_authorized_keys:
+- ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCk4KaJWaDq/xLOlOTE2IcNE8mAx0NXxc6AkN9GB8J3ePWl0RkWXWor+otswCBsI1hn1MU2qczHYvMCsvLuMMKdxSlSR6GbZ/0TO+UPvwiHtqhgZ1xkhDQN7/LN4VpuJKTm5SYrxv+DWRROlizktBcOchiADUeLrapkEgnMUcnp7g76FfI2VLLB5M2at4TLRVtOK9M0+JQA4gQWPKA3uHBPGNFhnCEtLMbS5Yg7eeR09aDxCV/aozMMzcKA6ou99rtSnGr8nqj3eA0v5GULLdIhdALkwmS/W43E+ZTTsgmUvACuuPoW0C3hN9pxSd/43jJ9cgYJ9YIe7m7qtFl1lJOskVAiCFR2oYT74zLWniJhmo9svtuPApqzcNdmBc02ppGa3Yeff0D1WShEJKnFVKF4MtYP66BVB7hszujbTIZ/FRRxjpgNlTnoY1NLTWYziZgU99ySU9wGqiOcAso7w4AY1WIn9+7UYPhURyLylODKn3t8nGNVYvtllKa7HUSfyYU=
+
+users:
+- default
+- name: ian
+  gecos: Ian Cornett
+  groups: user, sudo
+  sudo: ALL=(ALL) NOPASSWD:ALL
+  shell: /bin/bash
+  ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCpISAw1rE2B5ax/288aGf1ZM/EMEidhLnj86LppnGraYcmeq9Z4z/4rM/ch6nxHby/Lt20KK61H3poduY/Pv4yl3cXVMC3O41iQ9+IwdO3DJ+vbtaU0mMbzrLK7KztNljPBvf/NvTjFX2i3wZnnkfQ5A+6SvPNdxjl5hCam5ncT2n+V7ZDS7ygA9WEfn8/4ickJvKiliGBQRnQfexLq6/ladUaNOSu6bFlAaF/RrtU+fS0J4w3yedH1d+KYjMsH1P4cEcoyPsQunmCPU7TIT6EEQxQlgrh1Y3T5UrPVHlItXJnmjnnVYPZF6opPVK6/aU7UIQbOISjQl3vQS5D21NRx3nuwPbPSUIHpmnHraz7zaX9yO634rbH87TuK7r76iQ205uYHNLThHc6DM+1zpK51yIp1zQJdagDeppFunaADW4X9TszCBcYMhgIG3EKxHtc5LHF5Ets7z8tKdquKHPHhLBpIpYQs6P0nlyo+gB/wnedhzmJ3X4Ag80Ad5fpCHx82y6qEbggeg9N1/mBMbU3bjpTj/esm9HppCdDt6rQkbp+26AZB5FhrvMHGcPHteusex2OfYX1oQfjBh10mus9ssyBGrOmvHMmFtP7Q5gP51H6LOc7Gl/ZIbD2yp0NF6m01Dvojg3Uu/VBZrh26U9oxvUy4dSsQWatuHopzv3isw== macos key new laptop
