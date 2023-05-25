@@ -2,10 +2,12 @@
 
 [CmdletBinding()]
 param (
-    [Parameter(HelpMessage = 'The name of the VM to deploy', Position = 0)]
+    [Parameter(HelpMessage = 'The name of the docker host')]
     [String]
-    $VM_NAME = 'fakedocker'
+    $VM_NAME = 'docker'
 )
+
+$VM_IMAGE = 'docker'
 
 $ErrorActionPreference = 'Stop'
 
@@ -32,7 +34,7 @@ else {
 }
 
 # Check if the VM exists
-if ((multipass list) -match $VM_NAME) {
+if ((multipass list) -match $VmName) {
     # Get the VM's status
     $STATUS = ((multipass info $VM_NAME) -match "^State").Split()[-1]
     if ($STATUS -eq "Stopped") {
@@ -46,10 +48,15 @@ if ((multipass list) -match $VM_NAME) {
 }
 else {
     Write-Host "Docker Host $VM_NAME doesn't exist."
-    multipass launch --name $VM_NAME --cloud-init ./cloud-init-multipass.yml --cpus 2 --memory 4G --disk 20G --timeout 600
+    multipass launch remote:$VM_IMAGE --name  $VM_NAME --cpus 2 --memory 4G --disk 20G --timeout 600
 }
 
-$env:DOCKER_HOST = "tcp://$VM_NAME.local:2375"
-multipass mount $env:USERPROFILE ${$VM_NAME}:/home/ubuntu
+$IP_ADDRESS = (multipass list --format csv | Select-String $VM_NAME | ForEach-Object { ($_ -split ',')[2] } | Select-String '^192')
+
+
+(Get-Content -Path C:\Windows\System32\drivers\etc\hosts) | Where-Object { $_ -notmatch "$VM_NAME" } | Set-Content -Path C:\Windows\System32\drivers\etc\hosts
+Write-Output "$IP_ADDRESS $VM_NAME.local" | Out-File -Append -FilePath C:\Windows\System32\drivers\etc\hosts
+
+$env:DOCKER_HOST = "tcp://$VM_NAME.local:2376"
 
 multipass shell $VM_NAME

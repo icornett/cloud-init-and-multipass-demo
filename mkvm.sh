@@ -2,14 +2,18 @@
 
 set -e -o pipefail
 
-# Check if an argument was provided, if not use default value
 if [ -z "$1" ]; then
-  ARG1_DEFAULT="fakedocker"
+  ARG1_DEFAULT="docker"
   echo "Using default value: $ARG1_DEFAULT"
   VM_NAME=$ARG1_DEFAULT
 else
   VM_NAME=$1
 fi
+
+# Now do something with the argument
+echo "Docker host name is $VM_NAME"
+
+VM_IMAGE=remote:docker
 
 if ! command -v multipass &> /dev/null
 then
@@ -30,11 +34,16 @@ if multipass list | grep -q $VM_NAME; then # Check if the VM exists
   fi
 else
     echo "Starting Docker Host $VM_NAME..."
-    multipass launch --name $VM_NAME --cloud-init cloud-init-multipass.yml --cpus 2 --memory 4G --disk 20G --timeout 600
+    multipass launch remote:$VM_IMAGE --cpus 2 --memory 4G --disk 20G --timeout 600
 fi
 
-export DOCKER_HOST="tcp://$VM_NAME.local:2375"
+NEW_IP=$(multipass list --format csv | grep $VM_NAME | awk -F',' '{print $3}' | grep '^192')
+echo $NEW_IP
 
-multipass mount $HOME $VM_NAME:/home/docker
+sudo sed -i "$VM_NAME" "/$VM_NAME/d" /etc/hosts
+sudo sh -c "echo '$NEW_IP $VM_NAME.local' >> /etc/hosts"
+
+
+export DOCKER_HOST="tcp://$VM_NAME.local:2375"
 
 multipass shell $VM_NAME
