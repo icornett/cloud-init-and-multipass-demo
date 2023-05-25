@@ -11,6 +11,15 @@ else
   VM_NAME=$1
 fi
 
+if ! command -v multipass &> /dev/null
+then
+    echo "Multipass is not installed. Installing..."
+    brew install multipass
+    echo "Multipass installed successfully."
+else
+    echo "Multipass is already installed."
+fi
+
 if multipass list | grep -q $VM_NAME; then # Check if the VM exists
   STATUS=$(multipass info $VM_NAME | awk '/^State/ {print $2}') # Get the VM's status
   if [ "$STATUS" == "Stopped" ]; then # Check if the VM is stopped
@@ -21,9 +30,8 @@ if multipass list | grep -q $VM_NAME; then # Check if the VM exists
   fi
 else
     echo "Starting Docker Host $VM_NAME..."
-    multipass launch --name $VM_NAME --cloud-init ./cloud-init-multipass.yml --cpus 2 --memory 4G --disk 20G --timeout 600
+    multipass launch --name $VM_NAME --cloud-init cloud-init-multipass.yml --cpus 2 --memory 4G --disk 20G --timeout 600
 fi
-
 
 export DOCKER_HOST="tcp://$VM_NAME.local:2375"
 

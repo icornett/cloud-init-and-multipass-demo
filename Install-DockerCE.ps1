@@ -9,6 +9,28 @@ param (
 
 $ErrorActionPreference = 'Stop'
 
+if ((Get-Command multipass -ErrorAction SilentlyContinue) -eq $null) {
+    Write-Host "Multipass is not installed. Installing..."
+    try {
+        if ($PSVersionTable.PSEdition -eq 'Desktop' -and $PSVersionTable.OS -match 'Windows') {
+            Write-Host "Operating system is Windows."
+            winget install Canonical.Multipass
+        }
+        else {
+            Write-Host "Operating system is not Windows."
+            brew install multipass
+        }
+        Write-Host "Multipass installed successfully."
+    }
+    catch {
+        Write-Error "Could not install Multipass"
+        throw
+    }
+}
+else {
+    Write-Host "Multipass is already installed."
+}
+
 # Check if the VM exists
 if ((multipass list) -match $VM_NAME) {
     # Get the VM's status
@@ -28,6 +50,6 @@ else {
 }
 
 $env:DOCKER_HOST = "tcp://$VM_NAME.local:2375"
-multipass mount $env:USERPROFILE ${$VM_NAME}:/home/docker
+multipass mount $env:USERPROFILE ${$VM_NAME}:/home/ubuntu
 
 multipass shell $VM_NAME

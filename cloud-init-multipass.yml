@@ -82,6 +82,7 @@ packages:
   - containerd.io
   - avahi-daemon
   - libnss-mdns
+  - openssh-server
 
 runcmd:
 - curl -fsSL https://get.docker.com -O - | bash
@@ -91,12 +92,6 @@ snap:
 
 groups:
   - docker
-users:
-  - default
-  - name: docker
-    groups: docker
-    sudo: ALL=(ALL) NOPASSWD:ALL
-    shell: /bin/bash
 write_files:
   - content: |
       [Service]
@@ -113,6 +108,12 @@ write_files:
     path: /lib/systemd/system/docker.service.d/overwrite.conf
     owner: root:root
     permissions: '0644'
+run_cmd:
+  - sudo usermod -aG docker $USER
+
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCk4KaJWaDq/xLOlOTE2IcNE8mAx0NXxc6AkN9GB8J3ePWl0RkWXWor+otswCBsI1hn1MU2qczHYvMCsvLuMMKdxSlSR6GbZ/0TO+UPvwiHtqhgZ1xkhDQN7/LN4VpuJKTm5SYrxv+DWRROlizktBcOchiADUeLrapkEgnMUcnp7g76FfI2VLLB5M2at4TLRVtOK9M0+JQA4gQWPKA3uHBPGNFhnCEtLMbS5Yg7eeR09aDxCV/aozMMzcKA6ou99rtSnGr8nqj3eA0v5GULLdIhdALkwmS/W43E+ZTTsgmUvACuuPoW0C3hN9pxSd/43jJ9cgYJ9YIe7m7qtFl1lJOskVAiCFR2oYT74zLWniJhmo9svtuPApqzcNdmBc02ppGa3Yeff0D1WShEJKnFVKF4MtYP66BVB7hszujbTIZ/FRRxjpgNlTnoY1NLTWYziZgU99ySU9wGqiOcAso7w4AY1WIn9+7UYPhURyLylODKn3t8nGNVYvtllKa7HUSfyYU=
+
 power_state:
   mode: reboot
   message: Restarting after configuring Ubuntu for Docker and Docker-Compose
