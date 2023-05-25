@@ -91,15 +91,12 @@ snap:
 
 groups:
   - docker
-# Add default auto created user to docker group
-- default
-- name: docker
-  groups: docker
-  sudo: ALL=(ALL) NOPASSWD:ALL
-  shell: /bin/bash
-  # Update your SSH Public Key
-  ssh_authorized_keys:
-    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCpISAw1rE2B5ax/288aGf1ZM/EMEidhLnj86LppnGraYcmeq9Z4z/4rM/ch6nxHby/Lt20KK61H3poduY/Pv4yl3cXVMC3O41iQ9+IwdO3DJ+vbtaU0mMbzrLK7KztNljPBvf/NvTjFX2i3wZnnkfQ5A+6SvPNdxjl5hCam5ncT2n+V7ZDS7ygA9WEfn8/4ickJvKiliGBQRnQfexLq6/ladUaNOSu6bFlAaF/RrtU+fS0J4w3yedH1d+KYjMsH1P4cEcoyPsQunmCPU7TIT6EEQxQlgrh1Y3T5UrPVHlItXJnmjnnVYPZF6opPVK6/aU7UIQbOISjQl3vQS5D21NRx3nuwPbPSUIHpmnHraz7zaX9yO634rbH87TuK7r76iQ205uYHNLThHc6DM+1zpK51yIp1zQJdagDeppFunaADW4X9TszCBcYMhgIG3EKxHtc5LHF5Ets7z8tKdquKHPHhLBpIpYQs6P0nlyo+gB/wnedhzmJ3X4Ag80Ad5fpCHx82y6qEbggeg9N1/mBMbU3bjpTj/esm9HppCdDt6rQkbp+26AZB5FhrvMHGcPHteusex2OfYX1oQfjBh10mus9ssyBGrOmvHMmFtP7Q5gP51H6LOc7Gl/ZIbD2yp0NF6m01Dvojg3Uu/VBZrh26U9oxvUy4dSsQWatuHopzv3isw== 
+users:
+  - default
+  - name: docker
+    groups: docker
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
 write_files:
   - content: |
       [Service]

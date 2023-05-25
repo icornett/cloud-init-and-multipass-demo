@@ -16,16 +16,18 @@ if ((multipass list) -match $VM_NAME) {
     if ($STATUS -eq "Stopped") {
         # Start the VM if it is stopped
         multipass start $VM_NAME
-        Write-Host "VM $VM_NAME has been started."
+        Write-Host "Docker Host $VM_NAME has been started."
     }
     else {
-        Write-Host "VM $VM_NAME is already running."
+        Write-Host "Docker Host $VM_NAME is already running."
     }
 }
 else {
-    Write-Host "VM $VM_NAME doesn't exist."
+    Write-Host "Docker Host $VM_NAME doesn't exist."
+    multipass launch --name $VM_NAME --cloud-init ./cloud-init-multipass.yml --cpus 2 --memory 4G --disk 20G --timeout 600
 }
 
-# SSH into the VM as docker user
 $env:DOCKER_HOST = "tcp://$VM_NAME.local:2375"
-ssh -o StrictHostKeyChecking=no docker@$VM_NAME.local
+multipass mount $env:USERPROFILE ${$VM_NAME}:/home/docker
+
+multipass shell $VM_NAME
